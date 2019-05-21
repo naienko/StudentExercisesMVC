@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace StudentExercisesAPI.Models
+namespace StudentExercisesMVC.Models
 {
     public class Instructor
     {

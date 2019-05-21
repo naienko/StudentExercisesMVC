@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using StudentExercisesAPI.Models;
+using StudentExercisesMVC.Models;
+using StudentExercisesMVC.Models.ViewModels;
 
 namespace StudentExercisesMVC.Controllers
 {
@@ -109,13 +110,14 @@ namespace StudentExercisesMVC.Controllers
         // GET: Students/Create
         public ActionResult Create()
         {
-            return View();
+            StudentCreateViewModel model = new StudentCreateViewModel(Connection);
+            return View(model);
         }
 
         // POST: Students/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([FromForm] Student student)
+        public async Task<ActionResult> Create([FromForm] StudentCreateViewModel model)
         {
             using (SqlConnection conn = Connection)
             {
@@ -126,10 +128,10 @@ namespace StudentExercisesMVC.Controllers
                 ( FirstName, LastName, SlackName, CohortId )
                 VALUES
                 ( @firstName, @lastName, @slackName, @cohortId )";
-                    cmd.Parameters.Add(new SqlParameter("@firstName", student._firstname));
-                    cmd.Parameters.Add(new SqlParameter("@lastName", student._lastname));
-                    cmd.Parameters.Add(new SqlParameter("@slackName", student._handle));
-                    cmd.Parameters.Add(new SqlParameter("@cohortId", student._cohortId));
+                    cmd.Parameters.Add(new SqlParameter("@firstName", model.student._firstname));
+                    cmd.Parameters.Add(new SqlParameter("@lastName", model.student._lastname));
+                    cmd.Parameters.Add(new SqlParameter("@slackName", model.student._handle));
+                    cmd.Parameters.Add(new SqlParameter("@cohortId", model.student._cohortId));
                     cmd.ExecuteNonQuery();
 
                     return RedirectToAction(nameof(Index));
