@@ -13,24 +13,24 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="student._firstname" class="control-label"></label>
-                <input asp-for="student._firstname" class="form-control" />
-                <span asp-validation-for="student._firstname" class="text-danger"></span>
+                <label asp-for="student.FirstName" class="control-label"></label>
+                <input asp-for="student.FirstName" class="form-control" />
+                <span asp-validation-for="student.FirstName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="student._lastname" class="control-label"></label>
-                <input asp-for="student._lastname" class="form-control" />
-                <span asp-validation-for="student._lastname" class="text-danger"></span>
+                <label asp-for="student.LastName" class="control-label"></label>
+                <input asp-for="student.LastName" class="form-control" />
+                <span asp-validation-for="student.LastName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="student._handle" class="control-label"></label>
-                <input asp-for="student._handle" class="form-control" />
-                <span asp-validation-for="student._handle" class="text-danger"></span>
+                <label asp-for="student.SlackHandle" class="control-label"></label>
+                <input asp-for="student.SlackHandle" class="form-control" />
+                <span asp-validation-for="student.SlackHandle" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Cohorts" class="control-label"></label>
-                <select asp-for="student._cohortId" asp-items="@Model.Cohorts" class="form-control"></select>
-                <span asp-validation-for="student._cohortId" class="text-danger"></span>
+                <select asp-for="student.CohortId" asp-items="@Model.Cohorts" class="form-control"></select>
+                <span asp-validation-for="student.CohortId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

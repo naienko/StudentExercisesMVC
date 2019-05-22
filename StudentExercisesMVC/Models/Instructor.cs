@@ -6,14 +6,14 @@ namespace StudentExercisesMVC.Models
     {
         public int Id { get; set; }
         [Required]
-        public string _firstname { get; set; }
+        public string FirstName { get; set; }
         [Required]
-        public string _lastname { get; set; }
+        public string LastName { get; set; }
         [Required]
         [StringLength(12, MinimumLength = 3)]
-        public string _handle { get; set; }
-        public string _specialty { get; set; }
-        public int _cohortId { get; set; }
-        public Cohort _cohort { get; set; }
+        public string SlackHandle { get; set; }
+        public string Specialty { get; set; }
+        public int CohortId { get; set; }
+        public Cohort Cohort { get; set; }
     }
 }

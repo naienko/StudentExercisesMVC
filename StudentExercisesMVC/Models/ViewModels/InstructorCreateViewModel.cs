@@ -8,22 +8,22 @@ using System.Threading.Tasks;
 
 namespace StudentExercisesMVC.Models.ViewModels
 {
-    public class StudentCreateViewModel
+    public class InstructorCreateViewModel
     {
-        public Student student { get; set; } = new Student();
+        public Instructor instructor { get; set; } = new Instructor();
 
         public List<SelectListItem> Cohorts;
 
         public SqlConnection Connection;
 
-        public StudentCreateViewModel() { }
-        public StudentCreateViewModel(SqlConnection connection)
+        public InstructorCreateViewModel() { }
+        public InstructorCreateViewModel(SqlConnection connection)
         {
             Connection = connection;
             GetAllCohorts();
         }
 
-        public void GetAllCohorts ()
+        public void GetAllCohorts()
         {
             using (SqlConnection conn = Connection)
             {

@@ -11,11 +11,11 @@ using StudentExercisesMVC.Models.ViewModels;
 
 namespace StudentExercisesMVC.Controllers
 {
-    public class StudentsController : Controller
+    public class ExercisesController : Controller
     {
         private readonly IConfiguration _config;
 
-        public StudentsController(IConfiguration config)
+        public ExercisesController(IConfiguration config)
         {
             _config = config;
         }
@@ -34,8 +34,7 @@ namespace StudentExercisesMVC.Controllers
                 return _config.GetConnectionString("DefaultConnection");
             }
         }
-
-        // GET: Students
+        // GET: Exercises
         public ActionResult Index()
         {
             using (SqlConnection conn = Connection)
@@ -43,34 +42,31 @@ namespace StudentExercisesMVC.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT s.Id, s.FirstName, s.LastName,
-                s.SlackName, s.CohortId
-                                FROM Student s";
+                    cmd.CommandText = @"SELECT e.Id, e.Title, e.Language
+                                FROM Exercise e";
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    List<Student> students = new List<Student>();
+                    List<Exercise> exercises = new List<Exercise>();
                     while (reader.Read())
                     {
-                        Student student = new Student
+                        Exercise exercise = new Exercise
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackName")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
+                            Title = reader.GetString(reader.GetOrdinal("Title")),
+                            Language = reader.GetString(reader.GetOrdinal("Language")),
                         };
 
-                        students.Add(student);
+                        exercises.Add(exercise);
                     }
 
                     reader.Close();
 
-                    return View(students);
+                    return View(exercises);
                 }
             }
         }
 
-        // GET: Students/Details/5
+        // GET: Exercises/Details/5
         public ActionResult Details(int id)
         {
             using (SqlConnection conn = Connection)
@@ -78,58 +74,52 @@ namespace StudentExercisesMVC.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT s.Id, s.FirstName, s.LastName,
-                s.SlackName, s.CohortId
-                                FROM Student s
-                                WHERE s.Id = @StudentId";
-                    cmd.Parameters.Add(new SqlParameter("@StudentId", id));
+                    cmd.CommandText = @"SELECT e.Id, e.Title, e.Language
+                                FROM Exercise e
+                                WHERE e.Id = @ExerciseId";
+                    cmd.Parameters.Add(new SqlParameter("@ExerciseId", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    Student student = null;
+                    Exercise exercise = null;
                     if (reader.Read())
                     {
-                        student = new Student
+                        exercise = new Exercise
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackName")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
+                            Title = reader.GetString(reader.GetOrdinal("Title")),
+                            Language = reader.GetString(reader.GetOrdinal("Language")),
                         };
                     }
 
                     reader.Close();
 
-                    return View(student);
+                    return View(exercise);
                 }
             }
         }
 
-        // GET: Students/Create
+        // GET: Exercises/Create
         public ActionResult Create()
         {
-            StudentCreateViewModel model = new StudentCreateViewModel(Connection);
-            return View(model);
+            return View();
         }
 
-        // POST: Students/Create
+        // POST: Exercises/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([FromForm] StudentCreateViewModel model)
+        public ActionResult Create([FromForm] Exercise exercise)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Student
-                ( FirstName, LastName, SlackName, CohortId )
+                    cmd.CommandText = @"INSERT INTO Exercise
+                ( Title, Language )
                 VALUES
-                ( @firstName, @lastName, @slackName, @cohortId )";
-                    cmd.Parameters.Add(new SqlParameter("@firstName", model.student.FirstName));
-                    cmd.Parameters.Add(new SqlParameter("@lastName", model.student.LastName));
-                    cmd.Parameters.Add(new SqlParameter("@slackName", model.student.SlackHandle));
-                    cmd.Parameters.Add(new SqlParameter("@cohortId", model.student.CohortId));
+                ( @title, @language )";
+                    cmd.Parameters.Add(new SqlParameter("@language", exercise.Language));
+                    cmd.Parameters.Add(new SqlParameter("@title", exercise.Title));
                     cmd.ExecuteNonQuery();
 
                     return RedirectToAction(nameof(Index));
@@ -137,31 +127,28 @@ namespace StudentExercisesMVC.Controllers
             }
         }
 
-        // GET: Students/Edit/5
+        // GET: Exercises/Edit/5
         public ActionResult Edit(int id)
         {
-            StudentEditViewModel model = new StudentEditViewModel(ConnectionString, id);
+            ExerciseEditViewModel model = new ExerciseEditViewModel(ConnectionString, id);
             return View(model);
         }
 
-        // POST: Students/Edit/5
+        // POST: Exercises/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, [FromForm] StudentEditViewModel model)
+        public ActionResult Edit(int id, [FromForm] Exercise exercise)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"UPDATE Student
-                                SET FirstName = @firstName, LastName = @lastName, SlackName = @slackName,
-                                    CohortId = @cohortId
+                    cmd.CommandText = @"UPDATE Exercise
+                                SET Title = @title, Language = @language
                                 WHERE Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@firstName", model.student.FirstName));
-                    cmd.Parameters.Add(new SqlParameter("@lastName", model.student.LastName));
-                    cmd.Parameters.Add(new SqlParameter("@slackName", model.student.SlackHandle));
-                    cmd.Parameters.Add(new SqlParameter("@cohortId", model.student.CohortId));
+                    cmd.Parameters.Add(new SqlParameter("@title", exercise.Title));
+                    cmd.Parameters.Add(new SqlParameter("@language", exercise.Language));
                     cmd.Parameters.Add(new SqlParameter("@Id", id));
                     cmd.ExecuteNonQuery();
 
@@ -170,13 +157,13 @@ namespace StudentExercisesMVC.Controllers
             }
         }
 
-        // GET: Students/Delete/5
+        // GET: Exercises/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: Students/Delete/5
+        // POST: Exercises/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
@@ -186,7 +173,7 @@ namespace StudentExercisesMVC.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"DELETE FROM Student WHERE Id = @id";
+                    cmd.CommandText = @"DELETE FROM Exercise WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     cmd.ExecuteNonQuery();
 
