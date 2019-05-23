@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using StudentExercisesMVC.Models;
+using StudentExercisesMVC.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -20,50 +21,23 @@ namespace StudentExercisesMVC.Models.ViewModels
         public InstructorCreateViewModel(SqlConnection connection)
         {
             Connection = connection;
-            GetAllCohorts();
+            CohortSelectFactory();
         }
 
-        public void GetAllCohorts()
+        public void CohortSelectFactory()
         {
-            using (SqlConnection conn = Connection)
+            var cohorts = CohortRepository.GetCohorts();
+            Cohorts = cohorts.Select(li => new SelectListItem
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-            SELECT c.Id,
-                c.Designation
-            FROM Cohort c
-        ";
-                    SqlDataReader reader = cmd.ExecuteReader();
+                Text = li.Name,
+                Value = li.Id.ToString()
+            }).ToList();
 
-                    List<Cohort> cohorts = new List<Cohort>();
-
-                    while (reader.Read())
-                    {
-                        Cohort cohort = new Cohort
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Designation")),
-                        };
-
-                        cohorts.Add(cohort);
-                        Cohorts = cohorts.Select(li => new SelectListItem
-                        {
-                            Text = li.Name,
-                            Value = li.Id.ToString()
-                        }).ToList();
-
-                        Cohorts.Insert(0, new SelectListItem
-                        {
-                            Text = "Choose cohort ...",
-                            Value = "0",
-                        });
-                    }
-
-                    reader.Close();
-                }
-            }
+            Cohorts.Insert(0, new SelectListItem
+            {
+                Text = "Choose cohort ...",
+                Value = "0",
+            });
         }
     }
 }

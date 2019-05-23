@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StudentExercisesMVC.Repositories;
 
 namespace StudentExercisesMVC
 {
@@ -45,6 +46,10 @@ namespace StudentExercisesMVC
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            StudentRepository.SetConfig(Configuration);
+            CohortRepository.SetConfig(Configuration);
+            InstructorRepository.SetConfig(Configuration);
 
             app.UseStaticFiles();
             app.UseCookiePolicy();

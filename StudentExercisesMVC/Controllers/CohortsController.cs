@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using StudentExercisesMVC.Models;
-using StudentExercisesMVC.Models.ViewModels;
+using StudentExercisesMVC.Repositories;
 
 namespace StudentExercisesMVC.Controllers
 {
@@ -38,63 +38,15 @@ namespace StudentExercisesMVC.Controllers
         // GET: Cohorts
         public ActionResult Index()
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"SELECT c.Id, c.Designation
-                                FROM Cohort c";
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    List<Cohort> cohorts = new List<Cohort>();
-                    while (reader.Read())
-                    {
-                        Cohort student = new Cohort
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Designation")),
-                        };
-
-                        cohorts.Add(student);
-                    }
-
-                    reader.Close();
-
-                    return View(cohorts);
-                }
-            }
+            var cohorts = CohortRepository.GetCohorts();
+            return View(cohorts);
         }
 
         // GET: Cohorts/Details/5
         public ActionResult Details(int id)
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"SELECT c.Id, c.Designation
-                                FROM Cohort c
-                                WHERE c.Id = @CohortId";
-                    cmd.Parameters.Add(new SqlParameter("@CohortId", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    Cohort cohort = null;
-                    if (reader.Read())
-                    {
-                        cohort = new Cohort
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Designation")),
-                        };
-                    }
-
-                    reader.Close();
-
-                    return View(cohort);
-                }
-            }
+            var cohort = CohortRepository.GetCohort(id);
+            return View(cohort);
         }
 
         // GET: Cohorts/Create
@@ -108,52 +60,15 @@ namespace StudentExercisesMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([FromForm] Cohort cohort)
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"INSERT INTO Cohort
-                ( Designation )
-                VALUES
-                ( @Name )";
-                    cmd.Parameters.Add(new SqlParameter("@Name", cohort.Name));
-                    cmd.ExecuteNonQuery();
-
-                    return RedirectToAction(nameof(Index));
-                }
-            }
+            Cohort newCohort = CohortRepository.CreateCohort(cohort);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Cohorts/Edit/5
         public ActionResult Edit(int id)
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"SELECT c.Id, c.Designation
-                                FROM Cohort c
-                                WHERE c.Id = @CohortId";
-                    cmd.Parameters.Add(new SqlParameter("@CohortId", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    Cohort cohort = null;
-                    if (reader.Read())
-                    {
-                        cohort = new Cohort
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Designation")),
-                        };
-                    }
-
-                    reader.Close();
-
-                    return View(cohort);
-                }
-            }
+            var cohort = CohortRepository.GetCohort(id);
+            return View(cohort);
         }
 
         // POST: Cohorts/Edit/5
@@ -161,52 +76,23 @@ namespace StudentExercisesMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, [FromForm] Cohort cohort)
         {
-            using (SqlConnection conn = Connection)
+            try
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"UPDATE Cohort 
-                                SET Designation = @Designation
-                                WHERE Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@Designation", cohort.Name));
-                    cmd.Parameters.Add(new SqlParameter("@Id", id));
-                    cmd.ExecuteNonQuery();
-
-                    return RedirectToAction(nameof(Index));
-                }
+                cohort.Id = id;
+                CohortRepository.UpdateCohort(cohort);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                return View(cohort);
             }
         }
 
         // GET: Cohorts/Delete/5
         public ActionResult Delete(int id)
         {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"SELECT c.Id, c.Designation
-                                FROM Cohort c
-                                WHERE c.Id = @CohortId";
-                    cmd.Parameters.Add(new SqlParameter("@CohortId", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    Cohort cohort = null;
-                    if (reader.Read())
-                    {
-                        cohort = new Cohort
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Designation")),
-                        };
-                    }
-
-                    reader.Close();
-
-                    return View(cohort);
-                }
-            }
+            var cohort = CohortRepository.GetCohort(id);
+            return View(cohort);
         }
 
         // POST: Cohorts/Delete/5
@@ -214,17 +100,13 @@ namespace StudentExercisesMVC.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
-            using (SqlConnection conn = Connection)
+            if (CohortRepository.DeleteCohort(id))
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"DELETE FROM Cohort WHERE Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-                    cmd.ExecuteNonQuery();
-
-                    return RedirectToAction(nameof(Index));
-                }
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                return RedirectToAction(nameof(Details), new { id = id });
             }
         }
     }
