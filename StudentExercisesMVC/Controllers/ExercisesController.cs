@@ -130,8 +130,33 @@ namespace StudentExercisesMVC.Controllers
         // GET: Exercises/Edit/5
         public ActionResult Edit(int id)
         {
-            ExerciseEditViewModel model = new ExerciseEditViewModel(ConnectionString, id);
-            return View(model);
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT e.Id, e.Title, e.Language
+                                FROM Exercise e
+                                WHERE e.Id = @ExerciseId";
+                    cmd.Parameters.Add(new SqlParameter("@ExerciseId", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Exercise exercise = null;
+                    if (reader.Read())
+                    {
+                        exercise = new Exercise
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Title = reader.GetString(reader.GetOrdinal("Title")),
+                            Language = reader.GetString(reader.GetOrdinal("Language")),
+                        };
+                    }
+
+                    reader.Close();
+
+                    return View(exercise);
+                }
+            }
         }
 
         // POST: Exercises/Edit/5
@@ -160,7 +185,33 @@ namespace StudentExercisesMVC.Controllers
         // GET: Exercises/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT e.Id, e.Title, e.Language
+                                FROM Exercise e
+                                WHERE e.Id = @ExerciseId";
+                    cmd.Parameters.Add(new SqlParameter("@ExerciseId", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Exercise exercise = null;
+                    if (reader.Read())
+                    {
+                        exercise = new Exercise
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Title = reader.GetString(reader.GetOrdinal("Title")),
+                            Language = reader.GetString(reader.GetOrdinal("Language")),
+                        };
+                    }
+
+                    reader.Close();
+
+                    return View(exercise);
+                }
+            }
         }
 
         // POST: Exercises/Delete/5

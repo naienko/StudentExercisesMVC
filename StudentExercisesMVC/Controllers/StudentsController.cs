@@ -173,7 +173,36 @@ namespace StudentExercisesMVC.Controllers
         // GET: Students/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT s.Id, s.FirstName, s.LastName,
+                s.SlackName, s.CohortId
+                                FROM Student s
+                                WHERE s.Id = @StudentId";
+                    cmd.Parameters.Add(new SqlParameter("@StudentId", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Student student = null;
+                    if (reader.Read())
+                    {
+                        student = new Student
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackName")),
+                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
+                        };
+                    }
+
+                    reader.Close();
+
+                    return View(student);
+                }
+            }
         }
 
         // POST: Students/Delete/5

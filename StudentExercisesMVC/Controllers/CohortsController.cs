@@ -88,7 +88,6 @@ namespace StudentExercisesMVC.Controllers
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Designation")),
                         };
-
                     }
 
                     reader.Close();
@@ -129,14 +128,38 @@ namespace StudentExercisesMVC.Controllers
         // GET: Cohorts/Edit/5
         public ActionResult Edit(int id)
         {
-            CohortEditViewModel model = new CohortEditViewModel(ConnectionString, id);
-            return View(model);
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT c.Id, c.Designation
+                                FROM Cohort c
+                                WHERE c.Id = @CohortId";
+                    cmd.Parameters.Add(new SqlParameter("@CohortId", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Cohort cohort = null;
+                    if (reader.Read())
+                    {
+                        cohort = new Cohort
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Designation")),
+                        };
+                    }
+
+                    reader.Close();
+
+                    return View(cohort);
+                }
+            }
         }
 
         // POST: Cohorts/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, [FromForm] CohortEditViewModel model)
+        public ActionResult Edit(int id, [FromForm] Cohort cohort)
         {
             using (SqlConnection conn = Connection)
             {
@@ -146,7 +169,7 @@ namespace StudentExercisesMVC.Controllers
                     cmd.CommandText = @"UPDATE Cohort 
                                 SET Designation = @Designation
                                 WHERE Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@Designation", model.cohort.Name));
+                    cmd.Parameters.Add(new SqlParameter("@Designation", cohort.Name));
                     cmd.Parameters.Add(new SqlParameter("@Id", id));
                     cmd.ExecuteNonQuery();
 
@@ -158,7 +181,32 @@ namespace StudentExercisesMVC.Controllers
         // GET: Cohorts/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT c.Id, c.Designation
+                                FROM Cohort c
+                                WHERE c.Id = @CohortId";
+                    cmd.Parameters.Add(new SqlParameter("@CohortId", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Cohort cohort = null;
+                    if (reader.Read())
+                    {
+                        cohort = new Cohort
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Designation")),
+                        };
+                    }
+
+                    reader.Close();
+
+                    return View(cohort);
+                }
+            }
         }
 
         // POST: Cohorts/Delete/5

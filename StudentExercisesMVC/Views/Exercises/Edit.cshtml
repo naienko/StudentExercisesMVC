@@ -1,4 +1,4 @@
-﻿@model StudentExercisesMVC.Models.ViewModels.ExerciseEditViewModel
+﻿@model StudentExercisesMVC.Models.Exercise
 
 @{
     ViewData["Title"] = "Edit";
@@ -13,14 +13,14 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="exercise.Title" class="control-label"></label>
-                <input asp-for="exercise.Title" class="form-control" />
-                <span asp-validation-for="exercise.Title" class="text-danger"></span>
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="exercise.Language" class="control-label"></label>
-                <input asp-for="exercise.Language" class="form-control" />
-                <span asp-validation-for="exercise.Language" class="text-danger"></span>
+                <label asp-for="Language" class="control-label"></label>
+                <input asp-for="Language" class="form-control" />
+                <span asp-validation-for="Language" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
