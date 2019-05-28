@@ -33,8 +33,9 @@ namespace StudentExercisesMVC.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT i.Id, i.FirstName, i.LastName, i.SlackName, i.CohortId, i.Specialty
-                                FROM Instructor i";
+                    cmd.CommandText = @"SELECT i.Id, i.FirstName, i.LastName, i.SlackName, i.CohortId, i.Specialty, c.Designation
+                                FROM Instructor i
+                                JOIN Cohort c ON c.Id = i.CohortId";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Instructor> instructors = new List<Instructor>();
@@ -47,7 +48,12 @@ namespace StudentExercisesMVC.Repositories
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             SlackHandle = reader.GetString(reader.GetOrdinal("SlackName")),
                             CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                            Specialty = reader.GetString(reader.GetOrdinal("Specialty"))
+                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
+                            Cohort = new Cohort
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                Name = reader.GetString(reader.GetOrdinal("Designation"))
+                            }
                         };
 
                         instructors.Add(instructor);
@@ -69,8 +75,9 @@ namespace StudentExercisesMVC.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT i.Id, i.FirstName, i.LastName, i.SlackName, i.CohortId, i.Specialty
+                    cmd.CommandText = @"SELECT i.Id, i.FirstName, i.LastName, i.SlackName, i.CohortId, i.Specialty, c.Designation
                                 FROM Instructor i
+                                JOIN Cohort c ON c.Id = i.CohortId
                                 WHERE i.Id = @InstructorId";
                     cmd.Parameters.Add(new SqlParameter("@InstructorId", id));
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -84,7 +91,12 @@ namespace StudentExercisesMVC.Repositories
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             SlackHandle = reader.GetString(reader.GetOrdinal("SlackName")),
                             CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                            Specialty = reader.GetString(reader.GetOrdinal("Specialty"))
+                            Specialty = reader.GetString(reader.GetOrdinal("Specialty")),
+                            Cohort = new Cohort
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                Name = reader.GetString(reader.GetOrdinal("Designation"))
+                            }
                         };
                     }
 

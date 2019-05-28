@@ -21,6 +21,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.SlackHandle)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cohort.Name)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -35,6 +38,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.SlackHandle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cohort.Name)
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |

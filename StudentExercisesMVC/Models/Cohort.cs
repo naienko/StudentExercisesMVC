@@ -8,6 +8,7 @@ namespace StudentExercisesMVC.Models
 		public int Id { get; set; }
         [Required]
         [StringLength(11, MinimumLength = 5)]
+        [Display(Name ="Cohort Designation")]
         public string Name { get; set; }
 
         public List<Student> Students { get; set; } = new List<Student>();
