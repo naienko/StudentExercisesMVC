@@ -33,8 +33,9 @@ namespace StudentExercisesMVC.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT s.Id, s.FirstName, s.LastName, s.SlackName, s.CohortId
-                                FROM Student s";
+                    cmd.CommandText = @"SELECT s.Id, s.FirstName, s.LastName, s.SlackName, s.CohortId, c.Designation
+                                FROM Student s
+                                JOIN Cohort c ON s.CohortId = c.Id";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Student> students = new List<Student>();
@@ -46,7 +47,12 @@ namespace StudentExercisesMVC.Repositories
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             SlackHandle = reader.GetString(reader.GetOrdinal("SlackName")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
+                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                            Cohort = new Cohort
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                Name = reader.GetString(reader.GetOrdinal("Designation"))
+                            }
                         };
 
                         students.Add(student);
@@ -68,22 +74,45 @@ namespace StudentExercisesMVC.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT s.Id, s.FirstName, s.LastName, s.SlackName, s.CohortId
+                    cmd.CommandText = @"SELECT s.Id, s.FirstName, s.LastName, s.SlackName, s.CohortId, c.Designation,
+                                    e.Id AS ExerciseId, e.Title, e.[Language]
                                 FROM Student s
+                                JOIN Cohort c ON s.CohortId = c.Id
+                                LEFT JOIN StudentExercise se ON se.StudentId = s.Id
+                                LEFT JOIN Exercise e ON se.ExerciseId = e.Id
                                 WHERE s.Id = @StudentId";
                     cmd.Parameters.Add(new SqlParameter("@StudentId", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        student = new Student
+                        if (student == null)
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackName")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
-                        };
+                            student = new Student
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                SlackHandle = reader.GetString(reader.GetOrdinal("SlackName")),
+                                CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                Cohort = new Cohort
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                    Name = reader.GetString(reader.GetOrdinal("Designation"))
+                                }
+                            };
+                        }
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("ExerciseId")))
+                        {
+                            student.Exercises.Add(new Exercise
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("ExerciseId")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                Language = reader.GetString(reader.GetOrdinal("Language"))
+                            });
+                        }
+
                     }
 
                     reader.Close();
