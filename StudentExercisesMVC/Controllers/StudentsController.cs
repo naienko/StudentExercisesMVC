@@ -83,7 +83,7 @@ namespace StudentExercisesMVC.Controllers
                 model.student.Id = id;
                 StudentRepository.UpdateStudent(model.student);
 
-                //clear out assigned exercises?
+                //clear out assigned exercises
                 ExerciseRepository.ClearAssignedExercises(model.student.Id);
 
                 //assign exercises selected in the form

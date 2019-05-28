@@ -105,7 +105,7 @@ namespace StudentExercisesMVC.Repositories
 
                         if (!reader.IsDBNull(reader.GetOrdinal("ExerciseId")))
                         {
-                            student.Exercises.Add(new Exercise
+                            student.AssignedExercises.Add(new Exercise
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("ExerciseId")),
                                 Title = reader.GetString(reader.GetOrdinal("Title")),

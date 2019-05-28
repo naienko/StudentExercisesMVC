@@ -19,6 +19,6 @@ namespace StudentExercisesMVC.Models
         public int CohortId { get; set; }
         public Cohort Cohort;
 
-        public List<Exercise> Exercises { get; set; } = new List<Exercise>();
+        public List<Exercise> AssignedExercises { get; set; } = new List<Exercise>();
     }
 }

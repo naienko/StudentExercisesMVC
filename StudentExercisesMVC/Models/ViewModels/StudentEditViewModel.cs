@@ -12,7 +12,7 @@ namespace StudentExercisesMVC.Models.ViewModels
     public class StudentEditViewModel
     {
         //a student
-        public Student student { get; set; } = new Student();
+        public Student student { get; set; }
 
         //all cohorts
         public List<SelectListItem> Cohorts;
@@ -25,9 +25,9 @@ namespace StudentExercisesMVC.Models.ViewModels
         public StudentEditViewModel() { }
         public StudentEditViewModel(int id)
         {
+            student = StudentRepository.GetStudent(id);
             CohortSelectFactory();
             ExerciseSelectFactory();
-            student = StudentRepository.GetStudent(id);
         }
 
         public void CohortSelectFactory()
@@ -48,12 +48,13 @@ namespace StudentExercisesMVC.Models.ViewModels
 
         private void ExerciseSelectFactory()
         {
+            //var exercises = ExerciseRepository.GetExercises();
             Exercises = ExerciseRepository.GetExercises()
                 .Select(e => new SelectListItem
                 {
                     Text = e.Title,
                     Value = e.Id.ToString(),
-                    Selected = student.Exercises.Find(ex => ex.Id == e.Id) != null
+                    Selected = student.AssignedExercises.Find(ex => ex.Id == e.Id) != null
                 }).ToList();
         }
     }
